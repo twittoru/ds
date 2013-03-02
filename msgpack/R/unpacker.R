@@ -28,7 +28,7 @@ setRefClass("unpacker",
     .reset = function() {
       .seek(1, .seek.set)
     },
-    unpack = function(binary) {
+    unpack = function(binary, is.inner=F) {
       if (.offset == 1) {
         if (is.character(binary)) {
           binary <- charToRaw(binary)
@@ -47,7 +47,7 @@ setRefClass("unpacker",
       } else if (currentByte < 0xa0) {
         # FixArray
         n <- as.integer(currentByte & as.raw(0x0f))
-        value <- .makeArray(binary, n)
+        value <- .makeArray(binary, n, is.inner)
       } else if (currentByte < 0xc0) {
         # FixRaw
         n <- as.integer(currentByte & as.raw(0x1f))
@@ -108,11 +108,11 @@ setRefClass("unpacker",
       } else if (currentByte == 0xdc) {
         # array 16
         n <- .getLength(binary, 2)
-        value <- .makeArray(binary, n)
+        value <- .makeArray(binary, n, is.inner)
       } else if (currentByte == 0xdd) {
         # array 32
         n <- .getLength(binary, 4)
-        value <- .makeArray(binary, n)
+        value <- .makeArray(binary, n, is.inner)
       } else if (currentByte == 0xde) {
         # map 16
         n <- .getLength(binary, 2)
@@ -145,9 +145,12 @@ setRefClass("unpacker",
       return(key)
     },
     .checkTypes = function(values) {
-      types <- unique(unlist(lapply(values, deepclass)))
-      if (length(types) == 1) {
-        class(values) <- types
+      if(all(sapply(values,length) == 1)) {
+        types <- unique(unlist(lapply(values, deepclass)))
+        len <- length(types)
+        if (len == 1 && types != "list") {
+          class(values) <- types
+        }
       }
       return(values)
     },
@@ -214,15 +217,19 @@ setRefClass("unpacker",
       if(string_mode) chars <- rawToChar(chars)
       return(chars)
     },
-    .makeArray = function(binary, n) {
+    .makeArray = function(binary, n, is.inner) {
+      if(n == 0) return(vector())
       arr <- vector(mode = "list", n)
       for (i in 1:n) {
-        arr[[i]] <- unpack(binary)
+        arr[[i]] <- unpack(binary, is.inner=T)
       }
-      arr <- .checkTypes(arr)
+      if(!is.inner) {
+        arr <- .checkTypes(arr)
+      }
       return(arr)
     },
     .makeMap = function(binary, n) {
+      if(n == 0) return(list())
       map <- vector(mode = "list", n)
       keys <- character(n)
       for (i in 1:n) {

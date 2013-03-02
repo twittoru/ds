@@ -1,5 +1,5 @@
 deepclass <- function(x) {
-  if(length(unlist(x)) > 1) return(lapply(x,deepclass))
+  if(length(unlist(x)) > 1) return(lapply(x,class))
   ifelse(is.na(x),list(),class(x))
 }
 doubleToBits <- function(x) fractionalToBits(x, 11, 52, 1023)
