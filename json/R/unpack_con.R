@@ -192,7 +192,7 @@ setRefClass("unpacker",
       i <- 1
       while (T) {
         key <- unpack(remainder=T)
-        if(is.null(key)) break
+        if(is.null(key)) { .skip(); break } # "}"
         keys[i] <- key
         curr <- .skip()
         if(curr == "}") break
