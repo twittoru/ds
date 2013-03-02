@@ -202,7 +202,7 @@ setRefClass("unpacker",
         if(curr != ",") stop(sprintf("%s,invalid object",curr))
         i <- i + 1
       }
-      if(length(arr) == 0) return(list())
+      if(length(map) == 0) return(list())
       names(map) <- keys
       map <- .checkTypes(map)
       return(map)
