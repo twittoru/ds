@@ -1,0 +1,25 @@
+test_that("frac",{
+  expect_equal(
+    sapply(pi*10^c(-2,-1,0,1,2,3),function(x) paste(rev(packBits(rev(as.integer(doubleToBits(x))))),collapse="")),
+    c(
+      "3fa015bf9217271a"
+      ,"3fd41b2f769cf0e0"
+      ,"400921fb54442d18"
+      ,"403f6a7a2955385e"
+      ,"4073a28c59d5433b"
+      ,"40a88b2f704a9409"
+    )
+  )
+  expect_equal(
+    doubleToBits(0),
+    c(rep(F,64))
+  )
+  expect_equal(
+    doubleToBits(.Machine$double.xmin),
+    c(rep(F,11),T,rep(F,52))
+  )
+  expect_equal(
+    doubleToBits(.Machine$double.xmax),
+    c(F,rep(T,10),F,rep(T,52))
+  )
+})
