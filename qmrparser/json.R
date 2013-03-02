@@ -84,7 +84,7 @@ json_object <- {
 }
 
 deepclass <- function(x) {
-  if(length(unlist(x)) > 1) return(lapply(x,deepclass))
+  if(length(unlist(x)) > 1) return(lapply(x,class))
   ifelse(is.na(x),list(),class(x))
 }
 checkTypes <- function(values) {
@@ -116,6 +116,7 @@ trans_array <- function(node,is.inner) {
     }
   } else {
     values <- lapply(node$value,function(n) translate(n,T))
+    if(is.inner) return(values)
     checkTypes(values)
   }
 }
@@ -131,7 +132,6 @@ translate <- function(node,is.inner=F) {
     `null` = NA,
   )
 }
-
 
 json.unpack <- function(string) {
   ret <- json_value()(streamParserFromString(string))
